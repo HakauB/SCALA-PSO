@@ -13,4 +13,8 @@ object PSOUtils {
   def randomDouble() : Double = {
     random.nextDouble()
   }
+  
+  def randomInt(max: Int) {
+    random.nextInt(max)
+  }
 }

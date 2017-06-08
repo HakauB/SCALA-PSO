@@ -2,24 +2,27 @@ package pso.variants.mopso
 
 import pso.core.Particle
 import scala.collection.parallel.mutable.ParArray
-import scala.collection.parallel.immutable.ParVector
-import scala.collection.mutable.ListBuffer
+import scala.collection.parallel.immutable.ParSet
+import scala.collection.mutable.Set
+import pso.core.PSOUtils
 
 class MultiObjectiveArchive(fitnessFunctions: ManyFitnessFunctions) {
   
-  var nondominatedSolutions = new ListBuffer[Particle]()
+  var nondominatedSolutions = ParSet[Particle]()
   
-  def paretoDominanceCheck(solutionA: Particle, solutionB: Particle): Boolean = {
+  def paretoDominanceCheck(newParticle: Particle, archiveMember: Particle): Boolean = {
     
     var cond1: Boolean = true
     var cond2: Boolean = false
     
+    // Check not worse in every way
     fitnessFunctions.functions.par.foreach{
-      x => if(x.getFitness(solutionA.position) > x.getFitness(solutionB.position)) (cond1 = false) else (cond1 = cond1); x;
+      x => if(x.getFitness(newParticle.position) < x.getFitness(archiveMember.position)) (cond1 = false)
     }
     
+    // Check better in some way
     fitnessFunctions.functions.par.foreach{
-      x => if(x.getFitness(solutionA.position) > x.getFitness(solutionB.position)) (cond2 = true) else (cond2 = cond2); x;
+      x => if(x.getFitness(newParticle.position) > x.getFitness(archiveMember.position)) (cond2 = true)
     }
     
     return cond1 && cond2
@@ -29,23 +32,34 @@ class MultiObjectiveArchive(fitnessFunctions: ManyFitnessFunctions) {
     
     var earlyBreak: Boolean = false
     
-    val nondomintedSolutionsList = nondominatedSolutions.toList
-    
-    nondomintedSolutionsList.par.foreach{
-      x => if(paretoDominanceCheck(x, newSolution)) (earlyBreak = true) else (earlyBreak = earlyBreak); x;
+    // If new solution is dominated
+    nondominatedSolutions.par.foreach{
+      x => if(paretoDominanceCheck(x, newSolution)) (earlyBreak = true)
     }
-    
+
+    // We break
     if(earlyBreak){
       return false;
     }
     
-    nondomintedSolutionsList.par.foreach{
-      x => if(paretoDominanceCheck(newSolution, x)) (nondominatedSolutions -= x); x;
-    }
+    // Remove newly dominated solutions
+    nondominatedSolutions = nondominatedSolutions.par.filter(x => !paretoDominanceCheck(newSolution, x))
+    println(nondominatedSolutions.size)
     
+    // Add the new solution
     nondominatedSolutions += newSolution
     
     return true;
+  }
+  
+  def getLeader(): Particle = {
+    nondominatedSolutions.head
+  }
+  
+  def printArchive(): Unit = {
+    nondominatedSolutions.par.foreach{
+      x => println(fitnessFunctions.functions(0).getFitness(x.position) + ", " + fitnessFunctions.functions(1).getFitness(x.position))
+    }
   }
   
 }

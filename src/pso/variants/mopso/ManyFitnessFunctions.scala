@@ -6,6 +6,8 @@ import pso.fitness.FitnessFunction
 
 class ManyFitnessFunctions(val functions: ParArray[FitnessFunction]) extends FitnessFunction {
   
-  
+  def getFitness(solution: ParArray[Double]): Double = {
+    1
+  }
   
 }

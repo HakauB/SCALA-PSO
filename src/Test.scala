@@ -6,14 +6,18 @@ import pso.core.PSODefault
 import pso.core.Parameters
 import pso.variants.dwpso.PSODW
 import pso.core.PSODefault
-
+import pso.variants.mopso.ManyFitnessFunctions
+import pso.variants.mopso.PSOMultiObjective
 
 object Test {
   
   
   def main(args: Array[String]): Unit = {
-    val pars: Parameters = new Parameters(Griewangk, new HaltConditionIterations(1000), 30)
-    val pso: PSODefault = new PSODefault(pars)
+    val multiFuncs: ParArray[FitnessFunction] = ParArray(MultiA, MultiB)
+    val multiFunc: ManyFitnessFunctions = new ManyFitnessFunctions(multiFuncs)
+    
+    val pars: Parameters = new Parameters(MultiA, new HaltConditionIterations(1000), 100)
+    val pso: PSOMultiObjective = new PSOMultiObjective(pars, multiFunc)
     pso.runPSO()
   }
   
@@ -86,6 +90,7 @@ object Test {
   
   //http://www.robertmarks.org/Classes/ENGR5358/Papers/functions.pdf 2.8
   object IncreasingPowerSum extends FitnessFunction {
+    
     override def getFitness(solution: ParArray[Double]): Double = {
       val range = ParArray.range(1, solution.length + 1)
       val pairs = range.zip(solution)
@@ -97,9 +102,11 @@ object Test {
   
   //http://www.robertmarks.org/Classes/ENGR5358/Papers/functions.pdf 2.9
   object Ackley extends FitnessFunction {
+    
     val a: Double = 20
     val b: Double = 0.2
     val c: Double = 2 * math.Pi
+    
     override def getFitness(solution: ParArray[Double]): Double = {
       val squares = solution.par.map({
         case x => x * x})
@@ -112,5 +119,25 @@ object Test {
     }
   }
   
+  //from Studio5 -- fitness1
+  object MultiA extends FitnessFunction {
+    
+    def getFitness(solution: ParArray[Double]): Double = {
+      solution.head
+    }
+  }
+  
+  //from studio5 -- fitness2
+  object MultiB extends FitnessFunction {
+    
+    def getFitness(solution: ParArray[Double]): Double = {
+      val rest = solution.tail
+      val sum = rest.par.reduceLeft(_+_)
+      val gx = 1 + 9 * sum / (solution.length - 1)
+      
+      val hx = 1 - math.sqrt(solution.head / gx)
+      hx * gx
+    }
+  }
   
 }
