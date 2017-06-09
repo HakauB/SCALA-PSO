@@ -7,9 +7,9 @@ import pso.core.Particle
 import pso.halt.HaltCondition
 
 
-class PSOMultiObjective(parameters : Parameters, fitnessFuncs: ManyFitnessFunctions) extends PSO(parameters) {
-  val paretoArchive: MultiObjectiveArchive = new MultiObjectiveArchive(fitnessFuncs)
-  var particleArray: ParArray[Particle] = ParArray.fill[Particle](parameters.popSize)(new Particle(parameters))
+class PSOMultObjective(parameters : Parameters, fitnessFuncs: MultiFitnessFunction) extends PSO(parameters) {
+  val paretoArchive: MultiObjArchive = new MultiObjArchive(fitnessFuncs)
+  var particleArray: ParArray[Particle] = ParArray.fill[Particle](parameters.popSize)(new MultiParticle(parameters))
   var globalBestParticle = getBestParticle()
   
   override def initialisePopulation(): Unit = {    

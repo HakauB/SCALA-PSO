@@ -4,6 +4,9 @@ import scala.collection.parallel.mutable.ParArray
 import pso.fitness.FitnessFunction
 import pso.halt.HaltCondition
 
+/**
+ * Defines the parameters of a PSO algorithm
+ */
 class Parameters(
   var fitnessFunction: FitnessFunction,
   var haltCondition: HaltCondition,

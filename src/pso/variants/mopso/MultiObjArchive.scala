@@ -3,10 +3,10 @@ package pso.variants.mopso
 import pso.core.Particle
 import scala.collection.parallel.mutable.ParArray
 import scala.collection.parallel.immutable.ParSet
-import scala.collection.mutable.Set
+
 import pso.core.PSOUtils
 
-class MultiObjectiveArchive(fitnessFunctions: ManyFitnessFunctions) {
+class MultiObjArchive(fitnessFunctions: MultiFitnessFunction) {
   
   var nondominatedSolutions = ParSet[Particle]()
   
@@ -44,7 +44,6 @@ class MultiObjectiveArchive(fitnessFunctions: ManyFitnessFunctions) {
     
     // Remove newly dominated solutions
     nondominatedSolutions = nondominatedSolutions.par.filter(x => !paretoDominanceCheck(newSolution, x))
-    println(nondominatedSolutions.size)
     
     // Add the new solution
     nondominatedSolutions += newSolution
@@ -53,7 +52,7 @@ class MultiObjectiveArchive(fitnessFunctions: ManyFitnessFunctions) {
   }
   
   def getLeader(): Particle = {
-    nondominatedSolutions.head
+    nondominatedSolutions.toVector(PSOUtils.randomInt(nondominatedSolutions.size))
   }
   
   def printArchive(): Unit = {

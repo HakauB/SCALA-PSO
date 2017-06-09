@@ -8,10 +8,17 @@ import pso.halt.HaltConditionIterations
 
 class ParticleTimeVary(parameters : Parameters, var weightPB : Double, var weightGB : Double, var maxIt : Double) extends Particle(parameters) {
     
+  /** The starting particle best weight */
   val initialWeightPB : Double = weightPB
+  
+  /** The starting global best weight */
   val initialWeightGB : Double = weightGB
   
-  
+  /** Updates velocity according to time variant weights
+   * 
+   * @param globalBest The global best solution's particle
+   * @return The updated velocity
+   */
   override def getNextVelocity(globalBest: Particle): ParArray[Double] = {
     weightPB = (initialWeightPB - weightPB) * (1.0 / maxIt) + weightPB
     weightGB = (initialWeightGB - weightGB) * (1.0 / maxIt) + weightGB

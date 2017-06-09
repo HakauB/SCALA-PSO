@@ -5,10 +5,12 @@ import pso.core.Particle
 import scala.collection.parallel.mutable.ParArray
 import pso.stats.Stats
 
-class PSOTimeVary (parameters : Parameters, var weightPB : Double, var weightGB : Double, maxIt : Int) extends PSO(parameters) {
+/** Time-variant weight PSO */
+class PSOTimeVary (parameters : Parameters, var weightPB : Double = 1.0, var weightGB : Double = 1.0, maxIt : Int) extends PSO(parameters) {
   var particleArray: ParArray[Particle] = ParArray.fill[Particle](parameters.popSize)(new ParticleTimeVary(parameters, weightPB, weightGB, maxIt))
   var globalBestParticle = getBestParticle()
   
+  /** Update the solutions with time-variant weights */
   override def mainLoop(): Unit = {
     while (!parameters.haltCondition.shouldHalt(stats)) {
       particleArray.par.foreach{

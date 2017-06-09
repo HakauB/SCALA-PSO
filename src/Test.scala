@@ -6,18 +6,58 @@ import pso.core.PSODefault
 import pso.core.Parameters
 import pso.variants.dwpso.PSODW
 import pso.core.PSODefault
-import pso.variants.mopso.ManyFitnessFunctions
-import pso.variants.mopso.PSOMultiObjective
+import pso.variants.levy._
+import pso.variants.mopso._
+import pso.variants.dwpso._
+import pso.variants.sopso._
+import pso.variants.tvpso._
+import pso.variants.tvapso._
 
+/**
+ * An example implementation object for testing
+ */
 object Test {
   
-  
+  /**
+   * Runs the test
+   * 
+   */
   def main(args: Array[String]): Unit = {
-    val multiFuncs: ParArray[FitnessFunction] = ParArray(MultiA, MultiB)
-    val multiFunc: ManyFitnessFunctions = new ManyFitnessFunctions(multiFuncs)
     
-    val pars: Parameters = new Parameters(MultiA, new HaltConditionIterations(1000), 100)
-    val pso: PSOMultiObjective = new PSOMultiObjective(pars, multiFunc)
+    // Default PSO
+    val pars: Parameters = new Parameters(Sphere, new HaltConditionIterations(10000), 10)
+    val pso: PSODefault = new PSODefault(pars)
+    
+    // Levy PSO
+    //val pars: Parameters = new Parameters(Sphere, new HaltConditionIterations(10000), 30)
+    //val pso: PSOLevy = new PSOLevy(pars)
+    
+    // Levy PSO
+    //val pars: Parameters = new Parameters(Sphere, new HaltConditionIterations(10000), 30)
+    //val pso: PSOLevy = new PSOLevy(pars)
+    
+    // Decreasing Weight PSO
+    //val pars: Parameters = new Parameters(Sphere, new HaltConditionIterations(10000), 30)
+    //val pso: PSODW = new PSODW(pars)
+    
+    // Self organizing PSO
+    //val pars: Parameters = new Parameters(Sphere, new HaltConditionIterations(10000), 30)
+    //val pso: PSOSelfOrg = new PSOSelfOrg(pars, 100)
+    
+    // Time variant PSO
+    //val pars: Parameters = new Parameters(Sphere, new HaltConditionIterations(10000), 30)
+    //val pso: PSOTimeVary = new PSOTimeVary(pars, 1.0, 1.0, 10000)
+    
+    // Time variant accelerated PSO
+    //val pars: Parameters = new Parameters(Sphere, new HaltConditionIterations(10000), 30)
+    //val pso: PSOTimeVaryAcc = new PSOTimeVaryAcc(pars, 1.0, 1.0, 10000)
+    
+    //val multiFuncs: ParArray[FitnessFunction] = ParArray(MultiA, MultiB)
+    //val multiFunc: MultiFitnessFunction = new MultiFitnessFunction(multiFuncs)
+    //val pars: Parameters = new Parameters(MultiA, new HaltConditionIterations(10000), 30, weight = 0.5, particleWeight =  0.3, globalWeight = 0.2)
+    //val pso: PSOMultObjective = new PSOMultObjective(pars, multiFunc)
+    
+    
     pso.runPSO()
   }
   
@@ -25,12 +65,18 @@ object Test {
    * minimums and our PSO implementation looks for maximums
    */
   
+  /**
+   * Sphere test function
+   */
   object Sphere extends FitnessFunction {
     override def getFitness(solution: ParArray[Double]): Double = {
       -solution.par.foldLeft(0.0)(_ + Math.pow(_, 2)) / solution.length
     }
   }
   
+  /**
+   * Rastrigin test function
+   */
   object Rastrigin extends FitnessFunction {
     val A: Double = 10
     override def getFitness(solution: ParArray[Double]): Double = {
@@ -41,6 +87,9 @@ object Test {
     }
   }
   
+  /**
+   * Rosenbrock test function
+   */
   object Rosenbrock extends FitnessFunction {
     override def getFitness(solution: ParArray[Double]): Double = {
       //xs refers to xi
@@ -55,7 +104,9 @@ object Test {
     }
   }
   
-  //http://www.robertmarks.org/Classes/ENGR5358/Papers/functions.pdf 2.2
+  /**
+   * AxisHyperEllipsoid test function
+   */
   object AxisHyperEllipsoid extends FitnessFunction {
     override def getFitness(solution: ParArray[Double]): Double = {
       val range = ParArray.range(1, solution.length + 1)
@@ -66,7 +117,9 @@ object Test {
     }
   }
   
-  //http://www.robertmarks.org/Classes/ENGR5358/Papers/functions.pdf 2.6
+  /**
+   * Schwefel test function
+   */
   object Schwefel extends FitnessFunction {
     override def getFitness(solution: ParArray[Double]): Double = {
       val results = solution.par.map({
@@ -75,7 +128,9 @@ object Test {
     }
   }
   
-  //http://www.robertmarks.org/Classes/ENGR5358/Papers/functions.pdf 2.7
+  /**
+   * Griewangk test function
+   */
   object Griewangk extends FitnessFunction {
     override def getFitness(solution: ParArray[Double]): Double = {
       val range = ParArray.range(1, solution.length + 1)
@@ -88,7 +143,9 @@ object Test {
     }
   }
   
-  //http://www.robertmarks.org/Classes/ENGR5358/Papers/functions.pdf 2.8
+  /**
+   * IncreasingPowerSum test function
+   */
   object IncreasingPowerSum extends FitnessFunction {
     
     override def getFitness(solution: ParArray[Double]): Double = {
@@ -100,7 +157,9 @@ object Test {
     }
   }
   
-  //http://www.robertmarks.org/Classes/ENGR5358/Papers/functions.pdf 2.9
+  /**
+   * Ackley test function
+   */
   object Ackley extends FitnessFunction {
     
     val a: Double = 20
@@ -119,7 +178,9 @@ object Test {
     }
   }
   
-  //from Studio5 -- fitness1
+  /**
+   * MultiA test function
+   */
   object MultiA extends FitnessFunction {
     
     def getFitness(solution: ParArray[Double]): Double = {
@@ -127,7 +188,9 @@ object Test {
     }
   }
   
-  //from studio5 -- fitness2
+  /**
+   * MultiB test function
+   */
   object MultiB extends FitnessFunction {
     
     def getFitness(solution: ParArray[Double]): Double = {
